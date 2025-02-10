@@ -1,0 +1,4 @@
+Architecture: [784, 300, 10]
+Misclassified for training: 1.3833333333333333 %
+Misclassified for testing: 2.65 %
+Number of Epochs: 12

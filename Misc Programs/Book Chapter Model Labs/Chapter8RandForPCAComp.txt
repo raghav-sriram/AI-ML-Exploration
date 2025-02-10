@@ -1,0 +1,53 @@
+# Raghav Sriram
+# Period 6 ML Gabor
+# Chapter 8
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.decomposition import PCA
+import time
+
+f = 'jobs_in_data.csv'
+data = pd.read_csv(f)
+
+cData = pd.get_dummies(data, drop_first=True) # this is to encode categ vars
+
+target = 'salary_in_usd' # target var
+feats = cData.drop(target, axis=1)
+
+X_train, X_test, y_train, y_test = train_test_split(feats, cData[target], test_size=0.2, random_state=42) # Splitting the data into train/test
+
+rf = RandomForestRegressor(random_state=42) # Random Forest Regression on OG data
+start_time = time.time()
+rf.fit(X_train, y_train)
+rfTime = time.time() - start_time
+
+pred = rf.predict(X_test)# pred OG data
+
+
+
+# Applying PCA
+pca = PCA(n_components=0.95)  # w/ 95%
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+
+rfwPCA = RandomForestRegressor(random_state=42) # Random For v/ PCA
+start_time_pca = time.time()
+rfwPCA.fit(X_train_pca, y_train)
+pcaTime = time.time() - start_time_pca
+
+predPCA = rfwPCA.predict(X_test_pca)
+
+print()
+
+print("Original Model:")
+print("Time Taken: {:.2f} seconds".format(rfTime))
+print("Number of feats:", len(feats.columns))
+print("Dimensionality of the original dataset:", X_train.shape)                                 #96
+
+
+print("\nPCA-Reduced Model:")
+print("Time Taken: {:.2f} seconds".format(pcaTime))
+print("Number of PCA feats:", X_train_pca.shape[1])
+print("Dimensionality of the dataset after PCA:", X_train_pca.shape)
